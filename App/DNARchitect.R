@@ -278,7 +278,7 @@ geneCoordinatesByGene <- function(input){
   pattern <- ":(.*?)-"
   chromstart <- regmatches(input$geneId,regexec(pattern,input$geneId))
   pattern <- "-(.*?)$"
-  chromend <- regmatches(input$geneId,regexec(pattern,input$geneId))
+  chromend <- chromCoords (input$geneId,regexec(pattern,input$geneId))
   chromCoords <- list("chrom"=chrom[[1]][2],
                       "chromstart"=chromstart[[1]][2],
                       "chromend"=chromend[[1]][2])
@@ -332,21 +332,16 @@ makeBezierCurves <- function(data,input,genes,geneWindow){
   #Call color palette
   color_palette <- bezierColorPalette(input)
   color_select <- colorRampPalette(color_palette)
-  
   #Call plot layout
   plotLayout()
-  
-  
   ##Bezier curve plots
   parPlot()
-  
-  #Sushi colorby and colorbycol requires >= 2 samples, therefore the following conditional tests if the dataset has 1 or >=2 samples in data$samplenumber. If only 1 sample in data$samplenumber, then coloring is by `color="blue`; else coloring is by `colorby=data$samplenumber,colorbycol=color_select`
   if(max(data$samplenumber) == 1){
     #for only 1 sample in data$samplenumber
     ## USING SUSHI PACKAGE
     pbpe = plotBedpe(data,geneWindow$chrom,geneWindow$chromstart,geneWindow$chromend, heights = data[,7],plottype="loops",color=bezierColorPalette(input));
-    
-  }else{
+  }
+  else{
     #for >= 2 samples in data$samplenumber
     pbpe = plotBedpe(data,geneWindow$chrom,geneWindow$chromstart,geneWindow$chromend,heights = data[,7],plottype="loops",colorby=data[,8],colorbycol=color_select);
   }
@@ -363,7 +358,6 @@ makeBezierCurves <- function(data,input,genes,geneWindow){
   subPlotGenes(genes,geneWindow)
   #  }
 }
-
 
 #FUNCTION: to call makeBezierCurves with progress-bars
 plotBezierCurves <- function(data,input,genes,geneWindow){
@@ -706,8 +700,7 @@ server <- function(input, output, session) {
                 <b>Publications:</b> <br></br>
                 Martin, P., et al. Identifying Causal Genes at the Multiple Sclerosis Associated Region 6q23 Using Capture Hi-C. PLOS ONE 2016;11(11):e0166923.<br></br>
                 Martin, P., et al. Capture Hi-C reveals novel candidate genes and complex long-range interactions with related autoimmune risk loci. Nature Communications 2015;6:10069.
-                
-                
+
                 <hr></hr> <h3><b>ImmGen_T.Nve.Sp.ATAC.bg | ImmGen_Treg.Sp.ATAC.bg</b></h3> <h5>Organism: Mus musculus mm10</h5> <h5><b>Title:</b> ImmGen ATAC-seq data</h5>
                 <b>Summary:</b>
                 Immunological Genome Project chromatin accessibility maps for 86 different immunocytes (ATAC-seq). Immune cell populations were isolated in high-purity by flow cytometry.
@@ -720,8 +713,6 @@ server <- function(input, output, session) {
                 <b>Publications:</b><br></br>
                 Yoshida, H., Lareau, C. A., Ramirez, R. N., Rose, S. A., Maier, B., Wroblewska, A., . . . Benoist, C. (2019). The cis-Regulatory Atlas of the Mouse Immune System. Cell, 176(4), 897-912.e820. doi:<a href='https://doi.org/10.1016/j.cell.2018.12.036' target='_blank'>https://doi.org/10.1016/j.cell.2018.12.036</a>
                 
-                
-                
                 <hr></hr> <h3><b> FoxP3_ChIP-seq_Peaks.bed </b></h3>
                 <h5>Organism: Mus musculus mm10</h5>
                 <h5><b>Files:</b> FoxP3_5047_Peaks.txt</h5>
@@ -733,8 +724,6 @@ server <- function(input, output, session) {
                 <br></br>
                 <b>Publications:</b><br></br>
                 Kwon, H.-K., Chen, H.-M., Mathis, D., & Benoist, C. (2017). Different molecular complexes that mediate transcriptional induction and repression by FoxP3. Nature Immunology, 18(11), 1238-1248. doi:10.1038/ni.3835
-                
-                
                 "
     ))
   })
@@ -743,8 +732,6 @@ server <- function(input, output, session) {
   observeEvent(input$goToPlots, {
     updateTabsetPanel(session = session, inputId = "mainTabs", selected = "Plots")
   })
-  
-  
   ## Render appropriate number of textInput based on number of samples
   output$sampleNames <- renderUI({
     Samples <- lapply(1:input$numOfSamples, function(number){
@@ -756,8 +743,6 @@ server <- function(input, output, session) {
   })
   #Dynamic UI elements are suspended by default, when suspendWhenHidden = TRUE they are released Needtochange
   outputOptions(output, "sampleNames", suspendWhenHidden = FALSE) 
-  
-  
   # outputOptions(output, "searchNamesList", suspendWhenHidden = FALSE)
   
   ## Server code for Introduction by IntroJS
@@ -801,10 +786,7 @@ server <- function(input, output, session) {
       shinyjs::show(id = "HiCplot")
       #shinyjs::show(id = "HiCplotdownload")
       shinyjs::show(id = "HiCNetwork ")
-      shinyjs::show(id = "aa")
-     # updateSelectizeInput(session = session, inputId = "Load",  choices = c("K562_NHEK_GM12878-loops", "GSM1704495_GMPro_Cap_rep1_filt5", "GSM1704494_JKProCap_Rep1_Filt5"), 
-    #                       options = list(maxOptions = 3, placeholder = 'Type file name', onInitialize = I('function() { this.setValue(""); }')), selected = NULL)
-    }
+      shinyjs::show(id = "aa") }
     else{
       shinyjs::hide(id = "HiCplot")
       shinyjs::hide(id = "HiCNetwork ")
@@ -814,7 +796,6 @@ server <- function(input, output, session) {
     if ("ATAC" %in% input$fileTypes){
       shinyjs::show(id = "atacFormatPanelDiv")
       shinyjs::show(id = "ATACPlot")
-      #updateSelectizeInput(session = session, inputId = "Load",  choices = c("ImmGen_T.Nve.Sp.ATAC.bg", "ImmGen_Treg.Sp.ATAC.bg"), options = list(maxOptions = 4, placeholder = 'Type file name', onInitialize = I('function() { this.setValue(""); }')),selected = NULL)
     }
     else{
       shinyjs::hide(id = "atacFormatPanelDiv")
@@ -823,9 +804,7 @@ server <- function(input, output, session) {
     if ("ChIP" %in% input$fileTypes){
       shinyjs::show(id = "chipFormatPanelDiv")
       shinyjs::show(id = "ChIPPlot")
-      #updateSelectizeInput(session = session, inputId = "Load",  choices = c("FoxP3_ChIP-seq_Peaks.bed"), options = list(maxOptions = 1, placeholder = 'Type file name', onInitialize = I('function() { this.setValue(""); }')),selected = NULL)
-      #shinyjs::show(id = "chipPlot")
-    }
+  }
     else{
       shinyjs::hide(id = "chipFormatPanelDiv")
       shinyjs::hide(id = "ChIPPlot")
@@ -841,15 +820,6 @@ server <- function(input, output, session) {
       shinyjs::hide(id = "mRNAPlot")
       #shinyjs::hide(id = "mrnaPlot")
     }
-    # if ("HiC" %in% input$fileTypes && "ChIP" %in% input$fileTypes){
-    #    updateSelectizeInput(session = session, inputId = "Load",  choices = c("K562_NHEK_GM12878-loops", "GSM1704495_GMPro_Cap_rep1_filt5", "GSM1704494_JKProCap_Rep1_Filt5", "FoxP3_ChIP-seq_Peaks.bed"), 
-    #                         options = list(maxOptions = 3, placeholder = 'Type file name', onInitialize = I('function() { this.setValue(""); }')),selected = NULL)
-    #  }
-    #  if ("HiC" %in% input$fileTypes && "ATAC" %in% input$fileTypes){
-    #    updateSelectizeInput(session = session, inputId = "Load",  choices = c("K562_NHEK_GM12878-loops", "GSM1704495_GMPro_Cap_rep1_filt5", "GSM1704494_JKProCap_Rep1_Filt5", "ImmGen_T.Nve.Sp.ATAC.bg", "ImmGen_Treg.Sp.ATAC.bg"), 
-    #                         options = list(maxOptions = 3, placeholder = 'Type file name', onInitialize = I('function() { this.setValue(""); }')),selected = NULL)
-    #  }
-    
   })
   
   ## Generate dynamic upload UI based on fileTypes selected
@@ -921,11 +891,6 @@ server <- function(input, output, session) {
                            
                            # # Output: Data file ----
                            tableOutput(paste0(input$fileTypes[i],"Table"))
-                           ##\ div(id = "aa", style="display:none",
-                           # wellPanel(
-                           ##       htmlOutput(outputId = "InfoData")
-                           #)
-                           ## )
                  )
                )
       )
@@ -1040,11 +1005,9 @@ server <- function(input, output, session) {
         output$mRNATable <- renderTable({
           displayUploadedFile(data=mRNAdata, input, dataFileType="mRNA")
         })
-        #checkHeader(data=mRNAdata, dataFileType="mRNA", input)
       }
       #Increment progress
       incProgress(0.25)
-      
       if("HiC" %in% input$fileTypes){
         if(is.null(input$HiCFile)){
           switch (input$Load,
@@ -1086,15 +1049,11 @@ server <- function(input, output, session) {
         else{
           req(input$HiCFile)
           HiCdata <- HiCdataRead(input);
-          #  HiCdata1 <- read.delim(file = "hic_bedpe.txt")
           output$HiCTable <- renderTable({
             displayUploadedFile(data=HiCdata, input, dataFileType="HiC")
           })
         }
-        
-        #checkHeader(data=HiCdata, dataFileType="HiC", input)
       }
-      
       
       #Increment progress
       incProgress(0.50)
@@ -1132,7 +1091,6 @@ server <- function(input, output, session) {
             displayUploadedFile(data=ATACdata, input, dataFileType="ATAC")
           })
         }
-        #checkHeader(data=ATACdata, dataFileType="ATAC", input)
       }
       
       
@@ -1141,11 +1099,7 @@ server <- function(input, output, session) {
       
       if("ChIP" %in% input$fileTypes){
         if(is.null(input$ChIPFile)){
-          #switch (input$Load,
-          # "FoxP3_5047_Peaks" = {
           ChIPdata <- sampleData1
-          #  }
-          # )
           output$ChIPTable <- renderTable({
             if(eval(parse(text = (paste0("input$", "ChIP", "Disp")))) == "head") {
               head(ChIPdata) 
@@ -1162,17 +1116,15 @@ server <- function(input, output, session) {
             displayUploadedFile(data=ChIPdata, input, dataFileType="ChIP")
           })
         }
-        
-        #checkHeader(data=HiCdata, dataFileType="HiC", input)
       }
       
       #Increment progress
       incProgress(0.99)
-      
     })
     bedpeHeader <- c("chrom1","start1","end1","chrom2","start2","end2","score","samplenumber")
     bedHeader <- c("chrom","start","stop")
     bedgraphHeader <- c("chrom","start","stop","value")
+    
     ###### REACTIVE FUNCTION: Define reactive function to plot cytoscape network
     reactTONet <- reactive({
       #Load geneWindow from user defined parameters if input$submitByCoordinates is invalidated, else load by search coordinates if input$submitByGene is invalidated
@@ -1224,47 +1176,6 @@ server <- function(input, output, session) {
       network <- edgeData
       
       ntwrk <- graph_from_data_frame(d = edgeData, vertices = nodeData, directed = F)
-    })
-    plotCyNetwork <- reactive({
-      
-      withProgress(message = 'Making cytoscape plot', value = 0, {
-        
-        
-        
-        
-        
-        
-        # NOTE: Reactive variables used as functions networkReactive(). 
-        networkReactive <- reactive({
-          if(is.null(input$connectedNodes)) {
-            return(network)
-          } else {
-            t1 <- which(network$source %in% input$connectedNodes)
-            t2 <- which(network$target %in% input$connectedNodes)
-            idx <- unique(c(t1, t2))
-            return(network[idx,])
-          }
-        })
-        output$nodeDataTable <- DT::renderDataTable({
-          tmp <- nodeData[which(id == input$clickedNode),]
-          DT::datatable(tmp, filter='bottom', style='bootstrap', options=list(pageLength=5))
-        })
-        
-        output$edgeDataTable <- DT::renderDataTable({
-          DT::datatable(networkReactive(), filter='bottom', style='bootstrap', options=list(pageLength=5))
-        })
-        
-        output$clickedNode = renderPrint({
-          input$clickedNode
-        })
-        
-        output$connectedNodes = renderPrint({
-          input$connectedNodes
-        }) 
-      })
-      
-      # plot(ntwrk, vertex.color = "#CDD1BE", vertex.size =  node_size, edge.width = 1, vertex.label.font = 2, vertex.label = node_label)
-      
     })
     
     ##Download All
@@ -1380,10 +1291,8 @@ server <- function(input, output, session) {
           tryCatch(
             {
               if( input$atacFormat == "Bedgraph" ){
-                # par(mar = c(0,0,0,0))
                 plotBedgraphWrapper(data=ATACdata, input, genes, geneWindow, plotTopTitle = "ATAC-seq Data") 
               } else if ( input$atacFormat == "Bed" ){
-                #par(mar = c(0,0,0,0))
                 plotBedWrapper(data=ATACdata, input, genes, geneWindow, plotTopTitle = "ATAC-seq Data")
               }
             },
@@ -1423,14 +1332,13 @@ server <- function(input, output, session) {
           dev.off()
         }
       )
-      # Sys.setenv(R_ZIPCMD="/usr/bin/zip")
+      
+      #download as zip folder
       output$downloadDataBezierSVG <- downloadHandler(
         filename = function() {
           "BezierPlots.zip"
         },
         content = function(fname) {
-          #  owd <- setwd(tempdir())
-          # on.exit(setwd(owd))
           tmpdir <- tempdir()
           setwd(tempdir())
           allFileNames <- NULL
@@ -1476,10 +1384,7 @@ server <- function(input, output, session) {
             allFileNames <- c(fileName3, allFileNames)
           }
           zip::zipr(zipfile=fname, files=allFileNames, recurse = TRUE)  
-          #if(file.exists(paste0(fname, ".zip"))) {file.rename(paste0(fname, ".zip"), fname)}
-          
         }
-        #  contentType = "application/zip"
       )
       
       ######## ChIP Plot Output:
@@ -1711,7 +1616,6 @@ server <- function(input, output, session) {
           
         })
       output$plotgroups <- renderPlot({ 
-        #reactTONet()
         if( submitBy$method == "ByCoord" ){
           geneWindow <- defineGeneWindowByCoord(input);
         } else if ( submitBy$method == "ByGene" ) {
@@ -1800,7 +1704,6 @@ server <- function(input, output, session) {
         chrom = geneWindow$chrom;
         cStart = geneWindow$chromstart;
         cStop = geneWindow$chromend;
-        
         #Trim HiCdata by chrom, cStart, and cStop data
         trimmedData <- HiCdata[which(HiCdata[1] == chrom),]
         trimmedData <- trimmedData[which(trimmedData[2] > cStart),]
@@ -1828,7 +1731,6 @@ server <- function(input, output, session) {
         id <- nodes
         name <- id
         nodeData <- data.frame(id, name, stringsAsFactors=FALSE)
-        
         source <- HiCdata$node1
         target <- HiCdata$node2
         edgeData <- data.frame(source, target, stringsAsFactors=FALSE)
@@ -1837,7 +1739,6 @@ server <- function(input, output, session) {
         ## Code for displaying reactive network of selected node with connected nodes
         # Define network that will be used for displaying connected nodes as = edgeData
         network <- edgeData
-        
         ntwrk <- graph_from_data_frame(d = edgeData, vertices = nodeData, directed = F)
         deg <- igraph::degree(ntwrk, mode="all")
         deg.dist <- degree_distribution(ntwrk, cumulative=T, mode="all")
@@ -1895,7 +1796,6 @@ server <- function(input, output, session) {
         id <- nodes
         name <- id
         nodeData <- data.frame(id, name, stringsAsFactors=FALSE)
-        
         source <- HiCdata$node1
         target <- HiCdata$node2
         edgeData <- data.frame(source, target, stringsAsFactors=FALSE)
@@ -1965,7 +1865,6 @@ server <- function(input, output, session) {
         id <- nodes
         name <- id
         nodeData <- data.frame(id, name, stringsAsFactors=FALSE)
-        
         source <- HiCdata$node1
         target <- HiCdata$node2
         edgeData <- data.frame(source, target, stringsAsFactors=FALSE)
@@ -1974,15 +1873,12 @@ server <- function(input, output, session) {
         ## Code for displaying reactive network of selected node with connected nodes
         # Define network that will be used for displaying connected nodes as = edgeData
         network <- edgeData
-        
         ntwrk <- graph_from_data_frame(d = edgeData, vertices = nodeData, directed = F)
         deg <- igraph::degree(ntwrk, mode = "all")
         dens_deg <- density(x = deg)
         plot(dens_deg, xlab = "Degree", main = "Node Degree Density Plot")
         polygon(dens_deg, col="#DCF7F3", border="#45AAB8")
-        #degree_dataframe <- data.frame(deg)
-        #hist(x = deg, breaks=1:vcount(ntwrk)-1, main="Histogram of node degree", col = c("#62A9FF"), xlab = "Degree")
-        # ggplot(degree_dataframe, aes(x=deg)) + geom_density(color = "darkblue", fill = "skyblue") #+ labs(title =  "Node Degree Density Plot", x = "Degree", y = "Density")
+
         output$downloadPlot_node_degree <- downloadHandler(
           filename = "Node-Degree.png",
           content = function(file) {
@@ -1998,31 +1894,21 @@ server <- function(input, output, session) {
           })
       })
       
-      
-      
-      
       ######## Bezier Curve Plot Output:
       output$bezierplot <- renderPlot({
         isolate({
           #tryCatch error handling for "Error: replacement has 1 row, data has 0", which occurs when the genome window contains no nodes
           tryCatch(
             {
-              #par(mar = c(0,0,0,0))
               p <- plotBezierCurves(data=HiCdata, input, genes, geneWindow)
-              
             },
             error=function(e) {
               stop(safeError("Current genomic window cannot be plotted, probably because an anchor crosses the plot boundary. Adjust genomic window coordinates (zoom in or out) and re-submit"))
             })
         })
-      })
-      
-      
-      
+      }) 
     })
-    
-    
-    
+   
     ######Execute code to Generate Plots Once Press submitByCoordinates actionButton
     observeEvent(input$submitByCoordinates, {
       submitBy$method = "ByCoord"
@@ -2088,5 +1974,3 @@ server <- function(input, output, session) {
   
   }
 shinyApp(ui = ui, server = server)
-
-
